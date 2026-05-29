@@ -1,79 +1,10 @@
-const phone = "573224347855";
+const DEFAULT_PHONE = "573224347855";
 
-const products = [
-  {
-    id: "cap-noir",
-    category: "gorras",
-    name: "Gorra Noir Street",
-    description: "Gorra negra de perfil urbano, ajustable y facil de combinar.",
-    benefits: "Eleva outfits casuales y proyecta presencia limpia.",
-    price: 89000,
-    delivery: "24-72h",
-    guarantee: "Cambio por defecto de fabrica",
-    badge: "Top",
-    image: "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: "cap-cream",
-    category: "gorras",
-    name: "Gorra Urban Cream",
-    description: "Tono claro premium para looks modernos y minimalistas.",
-    benefits: "Aporta contraste, frescura e identidad visual.",
-    price: 94000,
-    delivery: "24-72h",
-    guarantee: "Revision al recibir",
-    badge: "Nuevo",
-    image: "https://images.unsplash.com/photo-1529958030586-3aae4ca485ff?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: "perfume-axis",
-    category: "perfumes",
-    name: "Perfume Axis 50ml",
-    description: "Aroma versatil con salida fresca y fondo elegante.",
-    benefits: "Ideal para citas, oficina, universidad y noche.",
-    price: 129000,
-    delivery: "24-72h",
-    guarantee: "Producto sellado",
-    badge: "Best seller",
-    image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: "perfume-volt",
-    category: "perfumes",
-    name: "Perfume Volt 100ml",
-    description: "Fragancia intensa para presencia memorable.",
-    benefits: "Proyecta seguridad, personalidad y estilo nocturno.",
-    price: 169000,
-    delivery: "48-72h",
-    guarantee: "Producto sellado",
-    badge: "Intenso",
-    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: "chain-steel",
-    category: "accesorios",
-    name: "Cadena Steel Line",
-    description: "Accesorio metalico sobrio para outfits urbanos.",
-    benefits: "Suma detalle sin sobrecargar tu imagen.",
-    price: 59000,
-    delivery: "24-72h",
-    guarantee: "Revision al recibir",
-    badge: "Combo",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: "watch-edge",
-    category: "accesorios",
-    name: "Reloj Edge Black",
-    description: "Reloj oscuro de linea limpia para presencia diaria.",
-    benefits: "Comunica puntualidad, orden y elegancia urbana.",
-    price: 149000,
-    delivery: "48-72h",
-    guarantee: "30 dias por defecto",
-    badge: "Premium",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80"
-  }
-];
+let phone = DEFAULT_PHONE;
+let products = [];
+let siteContent = {};
+let siteImages = {};
+let storeReady = false;
 
 const translations = {
   en: {
@@ -160,27 +91,264 @@ const formatter = new Intl.NumberFormat("es-CO", {
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function savedSupabaseConfig() {
+  try {
+    return JSON.parse(localStorage.getItem("belikan-admin-supabase") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function storefrontSupabase() {
+  const config = window.BELIKAN_SUPABASE_CONFIG?.url ? window.BELIKAN_SUPABASE_CONFIG : savedSupabaseConfig();
+  if (!config?.url || !config?.anonKey || !window.supabase?.createClient) {
+    document.documentElement.dataset.belikanDb = "disconnected";
+    console.warn("BELIKAN ecommerce sin conexion Supabase. Completa supabase-config.js con la misma URL y anon key de BELIKAN ADMIN.");
+    return null;
+  }
+  document.documentElement.dataset.belikanDb = "connected";
+  return window.supabase.createClient(config.url, config.anonKey);
+}
+
+function mapSupabaseProduct(product) {
+  return {
+    id: product.slug,
+    category: product.category,
+    name: product.name,
+    description: product.description || "",
+    benefits: product.benefits || "",
+    price: Number(product.price_cop || 0),
+    delivery: product.delivery || "24-72h",
+    guarantee: product.guarantee || "Revision al recibir",
+    badge: product.badge || "",
+    image: product.image_url || ""
+  };
+}
+
+async function loadCatalogFromSupabase() {
+  const client = storefrontSupabase();
+  if (!client) {
+    storeReady = false;
+    renderProducts();
+    renderCategoryFilters();
+    return;
+  }
+
+  try {
+    const { data, error } = await client
+      .from("catalog_products")
+      .select("*")
+      .eq("status", "active")
+      .order("category", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    storeReady = true;
+    products = (data || []).map(mapSupabaseProduct);
+    renderCategoryFilters();
+    renderProducts();
+    renderCart();
+  } catch (error) {
+    storeReady = false;
+    products = [];
+    renderCategoryFilters();
+    renderProducts();
+    renderCart();
+    console.warn("No se pudo cargar catalogo desde Supabase.", error);
+  }
+}
+
+async function loadSiteImagesFromSupabase() {
+  const client = storefrontSupabase();
+  if (!client) {
+    document.documentElement.dataset.belikanImages = "disconnected";
+    return;
+  }
+
+  try {
+    const { data, error } = await client
+      .from("site_images")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    siteImages = Object.fromEntries((data || []).map((image) => [image.image_key, image]));
+    applySiteImages();
+    document.documentElement.dataset.belikanImages = Object.keys(siteImages).length ? "loaded" : "empty";
+  } catch (error) {
+    document.documentElement.dataset.belikanImages = "error";
+    console.warn("No se pudieron cargar imagenes generales desde Supabase.", error);
+  }
+}
+
+async function loadSiteContentFromSupabase() {
+  const client = storefrontSupabase();
+  if (!client) {
+    applySiteContent();
+    return;
+  }
+
+  try {
+    const { data, error } = await client
+      .from("site_content")
+      .select("*")
+      .eq("is_active", true)
+      .order("section", { ascending: true })
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+    siteContent = Object.fromEntries((data || []).map((item) => [item.content_key, item]));
+    applySiteContent();
+  } catch (error) {
+    console.warn("No se pudo cargar contenido desde Supabase.", error);
+  }
+}
+
+function contentValue(key, fallback = "") {
+  return siteContent[key]?.content_value || fallback;
+}
+
+function applySiteContent() {
+  phone = contentValue("contact_whatsapp_phone", DEFAULT_PHONE).replace(/\D/g, "") || DEFAULT_PHONE;
+
+  $$("[data-content-key]").forEach((node) => {
+    const value = contentValue(node.dataset.contentKey);
+    if (!value) return;
+
+    if (node.tagName === "A" && node.dataset.contentHref === "whatsapp") {
+      node.href = `https://wa.me/${phone}`;
+    } else if (node.tagName === "A" && node.dataset.contentHref === "mailto") {
+      node.href = `mailto:${value}`;
+    }
+
+    node.textContent = value;
+  });
+
+  const whatsappLinks = $$('[href^="https://wa.me/"]');
+  whatsappLinks.forEach((link) => {
+    if (!link.href.includes("?text=")) link.href = `https://wa.me/${phone}`;
+  });
+
+  renderTicker();
+}
+
+function applySiteImages() {
+  const hero = siteImages.home_hero;
+  const lookbook = siteImages.home_lookbook;
+
+  if (hero?.image_url && $(".hero-media")) {
+    $(".hero-media").style.backgroundImage = `url("${hero.image_url}")`;
+  }
+
+  if (lookbook?.image_url && $(".lookbook-media")) {
+    $(".lookbook-media").style.backgroundImage = `url("${lookbook.image_url}")`;
+  }
+
+  $$("[data-image-key]").forEach((node) => {
+    const image = siteImages[node.dataset.imageKey];
+    if (!image?.image_url) return;
+    node.style.backgroundImage = `url("${image.image_url}")`;
+    if (image.alt) node.setAttribute("aria-label", image.alt);
+  });
+}
+
+function renderTicker() {
+  const track = $(".ticker-track");
+  if (!track) return;
+
+  const configured = contentValue("ticker_items");
+  const categories = [...new Set(products.map((product) => product.category).filter(Boolean))];
+  const items = configured
+    ? configured.split(",").map((item) => item.trim()).filter(Boolean)
+    : [...categories, "Streetwear", "Outfit", "Lifestyle"].filter(Boolean);
+  const doubled = [...items, ...items];
+
+  track.innerHTML = doubled.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+}
+
+function renderCategoryFilters() {
+  const filters = $(".filters");
+  const categories = [...new Set(products.map((product) => product.category).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, "es")
+  );
+
+  if (activeFilter !== "all" && !categories.includes(activeFilter)) activeFilter = "all";
+
+  if (filters) {
+    filters.innerHTML = [
+      `<button class="filter ${activeFilter === "all" ? "active" : ""}" type="button" data-filter="all" data-i18n="filterAll">Todo</button>`,
+      ...categories.map(
+        (category) =>
+          `<button class="filter ${activeFilter === category ? "active" : ""}" type="button" data-filter="${escapeHtml(category)}">${escapeHtml(category)}</button>`
+      )
+    ].join("");
+  }
+
+  const interest = $('.lead-form select[name="interest"]');
+  if (interest && categories.length) {
+    interest.innerHTML = [...categories, "Combo completo"].map((category) => `<option>${escapeHtml(category)}</option>`).join("");
+  }
+}
+
 function renderProducts() {
   const grid = $(".product-grid");
+  if (!grid) return;
+
+  if (!storeReady) {
+    grid.innerHTML = `
+      <article class="product-card catalog-empty" data-reveal>
+        <div class="product-info">
+          <h3>Catalogo no conectado</h3>
+          <p>Configura Supabase para cargar productos activos desde BELIKAN ADMIN.</p>
+        </div>
+      </article>
+    `;
+    observeReveals();
+    return;
+  }
+
+  if (!products.length) {
+    grid.innerHTML = `
+      <article class="product-card catalog-empty" data-reveal>
+        <div class="product-info">
+          <h3>Sin productos activos</h3>
+          <p>Activa productos en BELIKAN ADMIN para mostrarlos aqui.</p>
+        </div>
+      </article>
+    `;
+    observeReveals();
+    return;
+  }
+
   grid.innerHTML = products
     .map(
       (product) => `
-      <article class="product-card" data-category="${product.category}" ${activeFilter !== "all" && activeFilter !== product.category ? "hidden" : ""} data-reveal>
-        <div class="product-image" style="background-image: url('${product.image}')">
-          <span class="product-badge">${product.badge}</span>
+      <article class="product-card" data-category="${escapeHtml(product.category)}" ${activeFilter !== "all" && activeFilter !== product.category ? "hidden" : ""} data-reveal>
+        <div class="product-image" style="background-image: url(&quot;${escapeHtml(product.image)}&quot;)">
+          <span class="product-badge">${escapeHtml(product.badge)}</span>
         </div>
         <div class="product-info">
           <div>
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
+            <h3>${escapeHtml(product.name)}</h3>
+            <p>${escapeHtml(product.description)}</p>
           </div>
-          <p><strong>Beneficio:</strong> ${product.benefits}</p>
+          <p><strong>Beneficio:</strong> ${escapeHtml(product.benefits)}</p>
           <div>
-            <span class="delivery-note">Entrega ${product.delivery} / ${product.guarantee}</span>
+            <span class="delivery-note">Entrega ${escapeHtml(product.delivery)} / ${escapeHtml(product.guarantee)}</span>
           </div>
           <div class="product-meta">
             <strong class="price">${formatter.format(product.price)}</strong>
-            <button class="primary-btn add-to-cart" type="button" data-id="${product.id}">Agregar</button>
+            <button class="primary-btn add-to-cart" type="button" data-id="${escapeHtml(product.id)}">Agregar</button>
           </div>
         </div>
       </article>
@@ -193,6 +361,7 @@ function renderProducts() {
 
 function renderCart() {
   const items = $(".cart-items");
+  if (!items || !$(".cart-count") || !$(".cart-total-value")) return;
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
 
@@ -208,17 +377,17 @@ function renderCart() {
     .map(
       (item) => `
       <article class="cart-item">
-        <div class="cart-thumb" style="background-image: url('${item.image}')"></div>
+        <div class="cart-thumb" style="background-image: url(&quot;${escapeHtml(item.image)}&quot;)"></div>
         <div>
-          <strong>${item.name}</strong>
+          <strong>${escapeHtml(item.name)}</strong>
           <p>${formatter.format(item.price)}</p>
-          <div class="qty-controls" aria-label="Cantidad de ${item.name}">
-            <button type="button" data-action="decrease" data-id="${item.id}">-</button>
+          <div class="qty-controls" aria-label="Cantidad de ${escapeHtml(item.name)}">
+            <button type="button" data-action="decrease" data-id="${escapeHtml(item.id)}">-</button>
             <span>${item.qty}</span>
-            <button type="button" data-action="increase" data-id="${item.id}">+</button>
+            <button type="button" data-action="increase" data-id="${escapeHtml(item.id)}">+</button>
           </div>
         </div>
-        <button class="close-cart remove-item" type="button" data-action="remove" data-id="${item.id}" aria-label="Quitar ${item.name}">x</button>
+        <button class="close-cart remove-item" type="button" data-action="remove" data-id="${escapeHtml(item.id)}" aria-label="Quitar ${escapeHtml(item.name)}">x</button>
       </article>
     `
     )
@@ -227,6 +396,7 @@ function renderCart() {
 
 function addToCart(id) {
   const product = products.find((item) => item.id === id);
+  if (!product) return;
   const existing = cart.find((item) => item.id === id);
 
   if (existing) {
@@ -253,12 +423,14 @@ function updateCart(id, action) {
 }
 
 function openCart() {
+  if (!$(".cart-drawer")) return;
   $(".cart-drawer").style.setProperty("right", "0", "important");
   document.body.classList.add("cart-open");
   $(".cart-drawer").setAttribute("aria-hidden", "false");
 }
 
 function closeCart() {
+  if (!$(".cart-drawer")) return;
   $(".cart-drawer").style.setProperty("right", "-460px", "important");
   document.body.classList.remove("cart-open");
   $(".cart-drawer").setAttribute("aria-hidden", "true");
@@ -384,15 +556,17 @@ document.addEventListener("click", (event) => {
   }
 });
 
-$(".checkout").addEventListener("click", checkout);
-$(".lead-form").addEventListener("submit", handleLeadForm);
-$(".track-form").addEventListener("submit", handleTracking);
-$(".lang-toggle").addEventListener("click", switchLanguage);
+if ($(".checkout")) $(".checkout").addEventListener("click", checkout);
+if ($(".lead-form")) $(".lead-form").addEventListener("submit", handleLeadForm);
+if ($(".track-form")) $(".track-form").addEventListener("submit", handleTracking);
+if ($(".lang-toggle")) $(".lang-toggle").addEventListener("click", switchLanguage);
 
-$(".menu-toggle").addEventListener("click", () => {
-  const isOpen = document.body.classList.toggle("menu-open");
-  $(".menu-toggle").setAttribute("aria-expanded", String(isOpen));
-});
+if ($(".menu-toggle")) {
+  $(".menu-toggle").addEventListener("click", () => {
+    const isOpen = document.body.classList.toggle("menu-open");
+    $(".menu-toggle").setAttribute("aria-expanded", String(isOpen));
+  });
+}
 
 $$(".nav-links a").forEach((link) => {
   link.addEventListener("click", () => {
@@ -401,16 +575,24 @@ $$(".nav-links a").forEach((link) => {
   });
 });
 
-$(".chat-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const input = event.currentTarget.chat;
-  const text = input.value.trim();
-  if (!text) return;
-  addChatMessage(text);
-  botReply(text);
-  input.value = "";
-});
+if ($(".chat-form")) {
+  $(".chat-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = event.currentTarget.chat;
+    const text = input.value.trim();
+    if (!text) return;
+    addChatMessage(text);
+    botReply(text);
+    input.value = "";
+  });
+}
 
-renderProducts();
-renderCart();
-observeReveals();
+async function boot() {
+  renderCategoryFilters();
+  renderProducts();
+  renderCart();
+  observeReveals();
+  await Promise.all([loadCatalogFromSupabase(), loadSiteImagesFromSupabase(), loadSiteContentFromSupabase()]);
+}
+
+boot();

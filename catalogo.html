@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Catalogo Belikan: gorras, perfumes y accesorios." />
+    <title>Belikan | Catalogo</title>    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="nav" data-reveal>
+        <a class="brand" href="index.html" aria-label="Belikan inicio"><span class="brand-mark">B</span><span>Belikan</span></a>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav class="nav-links" aria-label="Navegacion principal">
+          <a href="index.html">Inicio</a>
+          <a href="catalogo.html">Catalogo</a>
+          <a href="contacto.html">Contactanos</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="icon-button lang-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+          <button class="cart-button" type="button" aria-label="Abrir carrito"><span data-i18n="cart">Carrito</span><strong class="cart-count">0</strong></button>
+        </div>
+      </header>
+
+      <main>
+        <section class="section catalog" id="catalogo">
+          <div class="catalog-head" data-reveal>
+            <div>
+              <p class="eyebrow" data-i18n="catalogEyebrow" data-content-key="catalog_eyebrow">Catalogo Belikan</p>
+              <h2 data-i18n="catalogTitle" data-content-key="catalog_title">Productos para verse, oler y sentirse mejor.</h2>
+            </div>
+            <div class="filters" aria-label="Filtrar productos">
+              <button class="filter active" type="button" data-filter="all" data-i18n="filterAll">Todo</button>
+              <button class="filter" type="button" data-filter="gorras" data-i18n="filterCaps">Gorras</button>
+              <button class="filter" type="button" data-filter="perfumes" data-i18n="filterPerfumes">Perfumes</button>
+              <button class="filter" type="button" data-filter="accesorios" data-i18n="filterAccessories">Accesorios</button>
+            </div>
+          </div>
+          <div class="product-grid" aria-live="polite"></div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="brand"><span class="brand-mark">B</span><span>Belikan</span></div>
+        <p data-i18n="footer" data-content-key="footer_text">Moda, presencia e identidad para Colombia.</p>
+        <a href="index.html#politicas" data-i18n="footerPolicies">Politicas</a>
+      </footer>
+    </div>
+
+    <aside class="cart-drawer" aria-hidden="true">
+      <div class="drawer-head"><div><p class="eyebrow" data-i18n="cart">Carrito</p><h2 data-i18n="yourSelection">Tu seleccion</h2></div><button class="close-cart" type="button" aria-label="Cerrar carrito">x</button></div>
+      <div class="cart-items"></div>
+      <div class="cart-total"><span>Total</span><strong class="cart-total-value">$0</strong></div>
+      <button class="primary-btn checkout" type="button" data-i18n="checkout">Pedir por WhatsApp</button>
+    </aside>
+    <div class="scrim"></div>
+
+    <script src="belikan-admin/vendor/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

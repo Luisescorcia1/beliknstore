@@ -7,9 +7,7 @@
       name="description"
       content="Belikan: e-commerce colombiano de gorras, accesorios y perfumes para elevar estilo, presencia e imagen personal."
     />
-    <title>Belikan | Moda urbana, accesorios y perfumes en Colombia</title>
-    <link rel="preconnect" href="https://images.unsplash.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <title>Belikan Colombia</title>    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&display=swap"
@@ -28,12 +26,9 @@
           <span></span><span></span><span></span>
         </button>
         <nav class="nav-links" aria-label="Navegacion principal">
-          <a href="#catalogo" data-i18n="navCatalog">Catalogo</a>
-          <a href="#nosotros" data-i18n="navAbout">Nosotros</a>
-          <a href="#servicios" data-i18n="navServices">Servicios</a>
-          <a href="#testimonios" data-i18n="navReviews">Testimonios</a>
-          <a href="#seguimiento" data-i18n="navTrack">Seguimiento</a>
-          <a href="#contacto" data-i18n="navContact">Contacto</a>
+          <a href="index.html">Inicio</a>
+          <a href="catalogo.html">Catalogo</a>
+          <a href="contacto.html">Contactanos</a>
         </nav>
         <div class="nav-actions">
           <button class="icon-button lang-toggle" type="button" aria-label="Cambiar idioma">EN</button>
@@ -46,24 +41,24 @@
 
       <main>
         <section class="hero" id="inicio">
-          <div class="hero-media" aria-hidden="true"></div>
+          <div class="hero-media" data-image-key="home_hero" aria-hidden="true"></div>
           <div class="hero-overlay"></div>
           <div class="hero-content" data-reveal>
-            <p class="eyebrow" data-i18n="heroEyebrow">Moda urbana colombiana contra entrega</p>
-            <h1>Belikan</h1>
-            <p class="hero-copy" data-i18n="heroCopy">
+            <p class="eyebrow" data-i18n="heroEyebrow" data-content-key="hero_eyebrow">Productos 100% Colombianos</p>
+            <h1 data-content-key="hero_title">Belikan</h1>
+            <p class="hero-copy" data-i18n="heroCopy" data-content-key="hero_copy">
               Gorras, accesorios y perfumes para expresar estilo, presencia y confianza con una compra online moderna.
             </p>
             <div class="hero-actions">
-              <a class="primary-btn" href="#catalogo" data-i18n="shopNow">Ver catalogo</a>
-              <a class="ghost-btn" href="https://wa.me/573224347855" target="_blank" rel="noreferrer" data-i18n="whatsapp">
+              <a class="primary-btn" href="catalogo.html" data-i18n="shopNow">Ver catalogo</a>
+              <a class="ghost-btn" href="https://wa.me/573224347855" target="_blank" rel="noreferrer" data-i18n="whatsapp" data-content-href="whatsapp">
                 Comprar por WhatsApp
               </a>
             </div>
             <div class="hero-stats" aria-label="Indicadores de Belikan">
-              <span><strong>24-72h</strong><small data-i18n="delivery">Entrega estimada</small></span>
-              <span><strong>CO</strong><small data-i18n="coverage">Cobertura nacional</small></span>
-              <span><strong>COD</strong><small data-i18n="payment">Contra entrega</small></span>
+              <span><strong data-content-key="hero_stat_1_value">CO</strong><small data-i18n="coverage" data-content-key="hero_stat_1_label">Cobertura nacional</small></span>
+              <span><strong data-content-key="hero_stat_2_value">COD</strong><small data-i18n="payment" data-content-key="hero_stat_2_label">Contra entrega</small></span>
+              <span><strong data-content-key="hero_stat_3_value">Entregas rapidas</strong><small data-i18n="delivery" data-content-key="hero_stat_3_label">Dias habiles</small></span>
             </div>
           </div>
         </section>
@@ -77,17 +72,17 @@
 
         <section class="section intro-grid" id="nosotros">
           <div class="section-copy" data-reveal>
-            <p class="eyebrow" data-i18n="aboutEyebrow">Sobre nosotros</p>
-            <h2 data-i18n="aboutTitle">Identidad, presencia y tendencia en una sola tienda.</h2>
-            <p data-i18n="aboutText">
+            <p class="eyebrow" data-i18n="aboutEyebrow" data-content-key="about_eyebrow">Sobre nosotros</p>
+            <h2 data-i18n="aboutTitle" data-content-key="about_title">Identidad, presencia y tendencia en una sola tienda.</h2>
+            <p data-i18n="aboutText" data-content-key="about_text">
               Belikan nacio para ayudar a las personas a expresar su estilo y confianza. Mas que vender productos,
               curamos piezas que elevan la imagen personal y conectan con estilos urbanos, elegantes y modernos.
             </p>
           </div>
           <div class="identity-panel" data-reveal>
             <span class="panel-number">01</span>
-            <h3 data-i18n="promiseTitle">Promesa de marca</h3>
-            <p data-i18n="promiseText">Una compra online accesible, visual y personalizada para todo Colombia.</p>
+            <h3 data-i18n="promiseTitle" data-content-key="promise_title">Promesa de marca</h3>
+            <p data-i18n="promiseText" data-content-key="promise_text">Una compra online accesible, visual y personalizada para todo Colombia.</p>
             <div class="mini-tags">
               <span>Premium</span><span>Urbano</span><span>Confiable</span><span>En tendencia</span>
             </div>
@@ -96,151 +91,49 @@
 
         <section class="section services" id="servicios">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow" data-i18n="servicesEyebrow">Servicios prioritarios</p>
-            <h2 data-i18n="servicesTitle">Compra con asesoria y entrega rapida.</h2>
+            <p class="eyebrow" data-i18n="servicesEyebrow" data-content-key="services_eyebrow">Servicios prioritarios</p>
+            <h2 data-i18n="servicesTitle" data-content-key="services_title">Compra con asesoria y entrega rapida.</h2>
           </div>
           <div class="service-grid">
             <article data-reveal>
               <span class="service-icon">01</span>
-              <h3 data-i18n="serviceOneTitle">Venta online</h3>
-              <p data-i18n="serviceOneText">Gorras, accesorios y perfumes con pago inmediato o contra entrega.</p>
+              <h3 data-i18n="serviceOneTitle" data-content-key="service_1_title">Venta online</h3>
+              <p data-i18n="serviceOneText" data-content-key="service_1_text">Gorras, accesorios y perfumes con pago inmediato o contra entrega.</p>
             </article>
             <article data-reveal>
               <span class="service-icon">02</span>
-              <h3 data-i18n="serviceTwoTitle">Asesoria de estilo</h3>
-              <p data-i18n="serviceTwoText">Recomendaciones segun outfit, ocasion, gusto y presupuesto.</p>
+              <h3 data-i18n="serviceTwoTitle" data-content-key="service_2_title">Asesoria de estilo</h3>
+              <p data-i18n="serviceTwoText" data-content-key="service_2_text">Recomendaciones segun outfit, ocasion, gusto y presupuesto.</p>
             </article>
             <article data-reveal>
               <span class="service-icon">03</span>
-              <h3 data-i18n="serviceThreeTitle">Combos y promociones</h3>
-              <p data-i18n="serviceThreeText">Arma tu presencia con kits de gorra, perfume y accesorio.</p>
+              <h3 data-i18n="serviceThreeTitle" data-content-key="service_3_title">Combos y promociones</h3>
+              <p data-i18n="serviceThreeText" data-content-key="service_3_text">Arma tu presencia con kits de gorra, perfume y accesorio.</p>
             </article>
             <article data-reveal>
               <span class="service-icon">04</span>
-              <h3 data-i18n="serviceFourTitle">Atencion directa</h3>
-              <p data-i18n="serviceFourText">Soporte por WhatsApp, Instagram, TikTok y Facebook como Belikn.</p>
+              <h3 data-i18n="serviceFourTitle" data-content-key="service_4_title">Atencion directa</h3>
+              <p data-i18n="serviceFourText" data-content-key="service_4_text">Soporte por WhatsApp, Instagram, TikTok y Facebook como Belikn.</p>
             </article>
           </div>
         </section>
-
-        <section class="section catalog" id="catalogo">
-          <div class="catalog-head" data-reveal>
-            <div>
-              <p class="eyebrow" data-i18n="catalogEyebrow">Catalogo Belikan</p>
-              <h2 data-i18n="catalogTitle">Productos para verse, oler y sentirse mejor.</h2>
-            </div>
-            <div class="filters" aria-label="Filtrar productos">
-              <button class="filter active" type="button" data-filter="all" data-i18n="filterAll">Todo</button>
-              <button class="filter" type="button" data-filter="gorras" data-i18n="filterCaps">Gorras</button>
-              <button class="filter" type="button" data-filter="perfumes" data-i18n="filterPerfumes">Perfumes</button>
-              <button class="filter" type="button" data-filter="accesorios" data-i18n="filterAccessories">Accesorios</button>
-            </div>
-          </div>
-          <div class="product-grid" aria-live="polite"></div>
-        </section>
-
-        <section class="section lookbook">
-          <div class="lookbook-media" data-reveal></div>
+<section class="section lookbook">
+          <div class="lookbook-media" data-image-key="home_lookbook" data-reveal></div>
           <div class="lookbook-copy" data-reveal>
-            <p class="eyebrow" data-i18n="lookbookEyebrow">Lookbook</p>
-            <h2 data-i18n="lookbookTitle">Del pedido al outfit: piezas que hablan antes que tu.</h2>
-            <p data-i18n="lookbookText">
+            <p class="eyebrow" data-i18n="lookbookEyebrow" data-content-key="lookbook_eyebrow">Lookbook</p>
+            <h2 data-i18n="lookbookTitle" data-content-key="lookbook_title">Del pedido al outfit: piezas que hablan antes que tu.</h2>
+            <p data-i18n="lookbookText" data-content-key="lookbook_text">
               Combina una gorra statement, un aroma limpio y accesorios metalicos para proyectar seguridad sin esfuerzo.
             </p>
-            <a class="primary-btn" href="#contacto" data-i18n="reserve">Reservar asesoría</a>
+            <a class="primary-btn" href="contacto.html" data-i18n="reserve">Reservar asesoria</a>
           </div>
         </section>
 
-        <section class="section testimonials" id="testimonios">
-          <div class="section-heading" data-reveal>
-            <p class="eyebrow" data-i18n="reviewsEyebrow">Testimonios</p>
-            <h2 data-i18n="reviewsTitle">Clientes que compran presencia.</h2>
-          </div>
-          <div class="testimonial-grid">
-            <blockquote data-reveal>
-              <p data-i18n="reviewOne">"La gorra llego rapido y el perfume huele a producto fino. Me asesoraron por WhatsApp."</p>
-              <cite>Daniela M. / Medellin</cite>
-            </blockquote>
-            <blockquote data-reveal>
-              <p data-i18n="reviewTwo">"Compre un combo para regalo. La presentacion se sintio premium y el pago fue facil."</p>
-              <cite>Juan P. / Bogota</cite>
-            </blockquote>
-            <blockquote data-reveal>
-              <p data-i18n="reviewThree">"Me ayudaron a escoger algo que combinara con mi estilo. Volveria a comprar."</p>
-              <cite>Camila R. / Cali</cite>
-            </blockquote>
-          </div>
-        </section>
 
-        <section class="section order-tools" id="seguimiento">
-          <div class="tracker" data-reveal>
-            <p class="eyebrow" data-i18n="trackEyebrow">Seguimiento</p>
-            <h2 data-i18n="trackTitle">Consulta tu pedido.</h2>
-            <form class="track-form">
-              <label for="orderCode" data-i18n="trackLabel">Codigo de pedido</label>
-              <div>
-                <input id="orderCode" name="orderCode" placeholder="BLK-1048" autocomplete="off" />
-                <button class="primary-btn" type="submit" data-i18n="trackButton">Consultar</button>
-              </div>
-            </form>
-            <div class="track-result" aria-live="polite"></div>
-          </div>
-          <div class="faq" data-reveal>
-            <p class="eyebrow">FAQ</p>
-            <details open>
-              <summary data-i18n="faqOneTitle">Cuanto tarda la entrega?</summary>
-              <p data-i18n="faqOneText">Entre 24 y 72 horas habiles segun ciudad y cobertura del operador logistico.</p>
-            </details>
-            <details>
-              <summary data-i18n="faqTwoTitle">Hay garantia?</summary>
-              <p data-i18n="faqTwoText">Si. Validamos defectos de fabrica y novedades reportadas al recibir el producto.</p>
-            </details>
-            <details>
-              <summary data-i18n="faqThreeTitle">Como pago?</summary>
-              <p data-i18n="faqThreeText">Puedes pagar inmediato o solicitar contra entrega donde este disponible.</p>
-            </details>
-          </div>
-        </section>
-
-        <section class="section contact" id="contacto">
-          <div class="contact-copy" data-reveal>
-            <p class="eyebrow" data-i18n="contactEyebrow">Contacto</p>
-            <h2 data-i18n="contactTitle">Hablemos de tu proximo outfit.</h2>
-            <p data-i18n="contactText">
-              Sin tienda fisica. Atendemos toda Colombia por WhatsApp, redes sociales y correo.
-            </p>
-            <div class="contact-list">
-              <a href="https://wa.me/573224347855" target="_blank" rel="noreferrer">WhatsApp: +57 322 434 7855</a>
-              <a href="mailto:belikn@gmail.com">belikn@gmail.com</a>
-              <span>Instagram / TikTok / Facebook: Belikn</span>
-            </div>
-          </div>
-          <form class="lead-form" data-reveal>
-            <label>
-              <span data-i18n="name">Nombre</span>
-              <input name="name" required placeholder="Tu nombre" />
-            </label>
-            <label>
-              <span data-i18n="interest">Interes</span>
-              <select name="interest">
-                <option>Gorras</option>
-                <option>Perfumes</option>
-                <option>Accesorios</option>
-                <option>Combo completo</option>
-              </select>
-            </label>
-            <label>
-              <span data-i18n="message">Mensaje</span>
-              <textarea name="message" rows="4" placeholder="Quiero asesoria para..."></textarea>
-            </label>
-            <button class="primary-btn" type="submit" data-i18n="sendWhatsapp">Enviar a WhatsApp</button>
-          </form>
-        </section>
-
-        <section class="policies" id="politicas">
+<section class="policies" id="politicas">
           <div data-reveal>
-            <h2 data-i18n="policiesTitle">Politicas de compra</h2>
-            <p data-i18n="policiesText">
+            <h2 data-i18n="policiesTitle" data-content-key="policies_title">Politicas de compra</h2>
+            <p data-i18n="policiesText" data-content-key="policies_text">
               Confirmamos disponibilidad antes del despacho. Cambios sujetos al estado del producto y reporte oportuno.
               Los tiempos pueden variar por ciudad, transportadora o temporada.
             </p>
@@ -253,7 +146,7 @@
           <span class="brand-mark">B</span>
           <span>Belikan</span>
         </div>
-        <p data-i18n="footer">Moda, presencia e identidad para Colombia.</p>
+        <p data-i18n="footer" data-content-key="footer_text">Moda, presencia e identidad para Colombia.</p>
         <a href="#politicas" data-i18n="footerPolicies">Politicas</a>
       </footer>
     </div>
@@ -283,7 +176,7 @@
           <button type="button" class="close-chat" aria-label="Cerrar chat">x</button>
         </div>
         <div class="chat-messages">
-          <p class="bot" data-i18n="botWelcome">Hola. Puedo ayudarte con reservas, pedidos, PQR o asesoria de estilo.</p>
+          <p class="bot" data-i18n="botWelcome" data-content-key="bot_welcome">Hola. Puedo ayudarte con reservas, pedidos, PQR o asesoria de estilo.</p>
         </div>
         <div class="quick-replies">
           <button type="button" data-reply="Quiero reservar un combo">Reservar</button>
@@ -297,6 +190,8 @@
       </div>
     </section>
 
+    <script src="belikan-admin/vendor/supabase.js"></script>
+    <script src="supabase-config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

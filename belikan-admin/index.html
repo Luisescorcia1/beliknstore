@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Panel administrativo Belikan para imagenes generales e inventario de catalogo con Supabase." />
+    <title>Belikan Admin | Ecommerce Supabase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="vendor/supabase.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="#top" aria-label="Belikan admin">
+          <span>B</span>
+          <strong>Belikan Admin</strong>
+        </a>
+        <nav aria-label="Secciones de administracion">
+          <button class="nav-item active" type="button" data-view="images">Imagenes generales</button>
+          <button class="nav-item" type="button" data-view="inventory">Inventario catalogo</button>
+          <button class="nav-item" type="button" data-view="content">Contenido ecommerce</button>
+          <button class="nav-item" type="button" data-view="settings">Conexion Supabase</button>
+        </nav>
+        <div class="session-card">
+          <p id="sessionStatus">Sin sesion</p>
+          <button class="secondary small" type="button" id="logoutBtn" hidden>Cerrar sesion</button>
+        </div>
+      </aside>
+
+      <main id="top">
+        <section class="hero-panel">
+          <div>
+            <p class="eyebrow">Control centralizado</p>
+            <h1>Ecommerce conectado totalmente a Supabase.</h1>
+            <p>Administra imagenes, contenido, catalogo y stock desde la misma base de datos.</p>
+          </div>
+          <div class="metrics" aria-label="Resumen">
+            <article>
+              <span id="imageCount">0</span>
+              <p>Imagenes activas</p>
+            </article>
+            <article>
+              <span id="productCount">0</span>
+              <p>Productos activos</p>
+            </article>
+            <article>
+              <span id="lowStockCount">0</span>
+              <p>Stock bajo</p>
+            </article>
+            <article>
+              <span id="contentCount">0</span>
+              <p>Textos activos</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="notice" id="connectionNotice">
+          <strong>Configura Supabase para empezar.</strong>
+          <span>Ingresa la Project URL y anon key en la seccion Conexion Supabase. Luego inicia sesion con un usuario de Supabase Auth.</span>
+        </section>
+
+        <section class="panel auth-panel" id="authPanel">
+          <div>
+            <p class="eyebrow">Acceso</p>
+            <h2>Ingreso de administrador</h2>
+            <p>Usa un usuario creado en Supabase Auth. Las policies del SQL permiten escritura solo a usuarios autenticados.</p>
+          </div>
+          <form id="loginForm" class="inline-form">
+            <label>
+              Email
+              <input type="email" name="email" placeholder="admin@belikan.co" autocomplete="email" required />
+            </label>
+            <label>
+              Password
+              <input type="password" name="password" placeholder="********" autocomplete="current-password" required />
+            </label>
+            <button class="primary" type="submit">Iniciar sesion</button>
+          </form>
+        </section>
+
+        <section class="view active" data-view-panel="images">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Ecommerce</p>
+              <h2>Imagenes generales</h2>
+              <p>Controla hero, banners, lookbook, categorias y cualquier imagen global que no sea producto.</p>
+            </div>
+            <button class="primary" type="button" data-open-modal="imageModal">Nueva imagen</button>
+          </div>
+          <div class="toolbar">
+            <input id="imageSearch" type="search" placeholder="Buscar por llave, titulo o seccion" />
+            <button class="secondary" type="button" id="refreshImages">Actualizar</button>
+          </div>
+          <div class="panel sql-hint">
+            <h3>Mapa de imagenes publicas</h3>
+            <p><code>home_hero</code> controla la imagen principal del inicio. <code>home_lookbook</code> controla la imagen del lookbook. Las imagenes de productos se cambian en Inventario catalogo, editando cada producto.</p>
+          </div>
+          <div class="card-grid" id="imagesGrid" aria-live="polite"></div>
+        </section>
+
+        <section class="view" data-view-panel="inventory">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Catalogo</p>
+              <h2>Inventario de productos</h2>
+              <p>Administra precio, stock, estado, categoria e imagen principal del producto.</p>
+            </div>
+            <button class="primary" type="button" data-open-modal="productModal">Nuevo producto</button>
+          </div>
+          <div class="toolbar split-toolbar">
+            <input id="productSearch" type="search" placeholder="Buscar por nombre, SKU o categoria" />
+            <select id="statusFilter" aria-label="Filtrar por estado">
+              <option value="all">Todos los estados</option>
+              <option value="active">Activo</option>
+              <option value="draft">Borrador</option>
+              <option value="archived">Archivado</option>
+            </select>
+            <button class="secondary" type="button" id="refreshProducts">Actualizar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoria</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="productsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="content">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Contenido</p>
+              <h2>Textos y datos del ecommerce</h2>
+              <p>Controla copys, datos de contacto, ticker, politicas y mensajes que consume la tienda publica.</p>
+            </div>
+            <button class="primary" type="button" data-open-modal="contentModal">Nuevo contenido</button>
+          </div>
+          <div class="toolbar split-toolbar">
+            <input id="contentSearch" type="search" placeholder="Buscar por llave, seccion o texto" />
+            <button class="secondary" type="button" id="refreshContent">Actualizar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Contenido</th>
+                  <th>Seccion</th>
+                  <th>Tipo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="contentTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="settings">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Supabase</p>
+              <h2>Conexion compartida</h2>
+              <p>Estos datos se guardan solo en este navegador. No uses service role key en frontend.</p>
+            </div>
+          </div>
+          <form id="settingsForm" class="settings-form panel">
+            <label>
+              Supabase Project URL
+              <input type="url" name="url" placeholder="https://xxxx.supabase.co" required />
+            </label>
+            <label>
+              Supabase anon public key
+              <textarea name="anonKey" rows="4" placeholder="eyJhbGciOi..." required></textarea>
+            </label>
+            <button class="primary" type="submit">Guardar conexion</button>
+            <button class="secondary" type="button" id="clearSettings">Borrar conexion local</button>
+          </form>
+          <div class="panel sql-hint">
+            <h3>Conexion de la ecommerce publica</h3>
+            <p>Si abres la tienda en otro dominio, por ejemplo Dev Tunnels, la configuracion local del admin no se comparte. Exporta este archivo y reemplaza <code>supabase-config.js</code> en la raiz del ecommerce.</p>
+            <div class="card-actions">
+              <button class="secondary" type="button" id="copyPublicConfig">Copiar supabase-config.js</button>
+              <button class="secondary" type="button" id="downloadPublicConfig">Descargar supabase-config.js</button>
+            </div>
+          </div>
+          <div class="panel sql-hint">
+            <h3>Antes de usar el panel</h3>
+            <p>Ejecuta el archivo <code>supabase/schema.sql</code> en el SQL editor de Supabase. Crea las tablas compartidas y el bucket publico <code>belikan-media</code>.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="imageModal" class="modal">
+      <form id="imageForm" method="dialog" class="modal-card">
+        <header>
+          <div>
+            <p class="eyebrow">Imagen global</p>
+            <h2 id="imageModalTitle">Nueva imagen</h2>
+          </div>
+          <button class="icon" type="button" data-close-modal="imageModal" aria-label="Cerrar">x</button>
+        </header>
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label>
+            Llave unica
+            <input name="image_key" placeholder="home_hero" required />
+          </label>
+          <label>
+            Seccion
+            <input name="section" placeholder="inicio" required />
+          </label>
+          <label>
+            Titulo interno
+            <input name="title" placeholder="Hero principal" required />
+          </label>
+          <label>
+            Orden
+            <input name="sort_order" type="number" value="0" min="0" />
+          </label>
+          <label class="wide">
+            Texto alternativo
+            <input name="alt" placeholder="Modelo usando gorra Belikan" />
+          </label>
+          <label class="wide">
+            URL de imagen
+            <input name="image_url" type="url" placeholder="https://..." />
+          </label>
+          <label class="wide upload-box">
+            Subir archivo a Supabase Storage
+            <input name="image_file" type="file" accept="image/*" />
+          </label>
+          <label class="check-line">
+            <input name="is_active" type="checkbox" checked />
+            Activa para ecommerce
+          </label>
+        </div>
+        <footer>
+          <button class="secondary danger" type="button" id="deleteImageBtn" hidden>Eliminar</button>
+          <button class="secondary" type="button" data-close-modal="imageModal">Cancelar</button>
+          <button class="primary" type="submit">Guardar imagen</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="productModal" class="modal">
+      <form id="productForm" method="dialog" class="modal-card large">
+        <header>
+          <div>
+            <p class="eyebrow">Producto catalogo</p>
+            <h2 id="productModalTitle">Nuevo producto</h2>
+          </div>
+          <button class="icon" type="button" data-close-modal="productModal" aria-label="Cerrar">x</button>
+        </header>
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label>
+            SKU
+            <input name="sku" placeholder="BLK-GOR-001" required />
+          </label>
+          <label>
+            Slug
+            <input name="slug" placeholder="gorra-noir-street" required />
+          </label>
+          <label class="wide">
+            Nombre
+            <input name="name" placeholder="Gorra Noir Street" required />
+          </label>
+          <label>
+            Categoria
+            <input name="category" placeholder="gorras" required />
+          </label>
+          <label>
+            Badge
+            <input name="badge" placeholder="Top" />
+          </label>
+          <label>
+            Precio COP
+            <input name="price_cop" type="number" min="0" step="100" placeholder="89000" required />
+          </label>
+          <label>
+            Stock
+            <input name="stock" type="number" min="0" step="1" value="0" required />
+          </label>
+          <label>
+            Estado
+            <select name="status" required>
+              <option value="active">Activo</option>
+              <option value="draft">Borrador</option>
+              <option value="archived">Archivado</option>
+            </select>
+          </label>
+          <label>
+            Entrega
+            <input name="delivery" placeholder="24-72h" />
+          </label>
+          <label class="wide">
+            Descripcion
+            <textarea name="description" rows="3" placeholder="Descripcion comercial"></textarea>
+          </label>
+          <label class="wide">
+            Beneficios
+            <textarea name="benefits" rows="2" placeholder="Beneficio principal para el cliente"></textarea>
+          </label>
+          <label>
+            Garantia
+            <input name="guarantee" placeholder="Cambio por defecto de fabrica" />
+          </label>
+          <label>
+            URL imagen
+            <input name="image_url" type="url" placeholder="https://..." />
+          </label>
+          <label class="wide upload-box">
+            Subir imagen a Supabase Storage
+            <input name="image_file" type="file" accept="image/*" />
+          </label>
+          <label class="check-line">
+            <input name="featured" type="checkbox" />
+            Producto destacado
+          </label>
+        </div>
+        <footer>
+          <button class="secondary danger" type="button" id="deleteProductBtn" hidden>Eliminar</button>
+          <button class="secondary" type="button" data-close-modal="productModal">Cancelar</button>
+          <button class="primary" type="submit">Guardar producto</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="contentModal" class="modal">
+      <form id="contentForm" method="dialog" class="modal-card">
+        <header>
+          <div>
+            <p class="eyebrow">Contenido ecommerce</p>
+            <h2 id="contentModalTitle">Nuevo contenido</h2>
+          </div>
+          <button class="icon" type="button" data-close-modal="contentModal" aria-label="Cerrar">x</button>
+        </header>
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label>
+            Llave unica
+            <input name="content_key" placeholder="hero_title" required />
+          </label>
+          <label>
+            Seccion
+            <input name="section" placeholder="inicio" required />
+          </label>
+          <label class="wide">
+            Etiqueta interna
+            <input name="label" placeholder="Hero titulo" required />
+          </label>
+          <label>
+            Tipo
+            <select name="content_type" required>
+              <option value="text">Texto corto</option>
+              <option value="textarea">Texto largo</option>
+              <option value="phone">Telefono</option>
+              <option value="email">Email</option>
+              <option value="url">URL</option>
+              <option value="csv">Lista separada por coma</option>
+            </select>
+          </label>
+          <label>
+            Orden
+            <input name="sort_order" type="number" value="0" min="0" />
+          </label>
+          <label class="wide">
+            Valor publicado
+            <textarea name="content_value" rows="5" placeholder="Texto que vera el cliente" required></textarea>
+          </label>
+          <label class="check-line">
+            <input name="is_active" type="checkbox" checked />
+            Activo para ecommerce
+          </label>
+        </div>
+        <footer>
+          <button class="secondary danger" type="button" id="deleteContentBtn" hidden>Eliminar</button>
+          <button class="secondary" type="button" data-close-modal="contentModal">Cancelar</button>
+          <button class="primary" type="submit">Guardar contenido</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

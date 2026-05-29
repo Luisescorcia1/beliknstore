@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Contacto Belikan: WhatsApp, correo y asesoria." />
+    <title>Belikan | Contacto</title>    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="nav" data-reveal>
+        <a class="brand" href="index.html" aria-label="Belikan inicio"><span class="brand-mark">B</span><span>Belikan</span></a>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav class="nav-links" aria-label="Navegacion principal">
+          <a href="index.html">Inicio</a>
+          <a href="catalogo.html">Catalogo</a>
+          <a href="contacto.html">Contactanos</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="icon-button lang-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+          <button class="cart-button" type="button" aria-label="Abrir carrito"><span data-i18n="cart">Carrito</span><strong class="cart-count">0</strong></button>
+        </div>
+      </header>
+
+      <main>
+        <section class="section contact" id="contacto">
+          <div class="contact-copy" data-reveal>
+            <p class="eyebrow" data-i18n="contactEyebrow" data-content-key="contact_eyebrow">Contacto</p>
+            <h2 data-i18n="contactTitle" data-content-key="contact_title">Hablemos de tu proximo outfit.</h2>
+            <p data-i18n="contactText" data-content-key="contact_text">Sin tienda fisica. Atendemos toda Colombia por WhatsApp, redes sociales y correo.</p>
+            <div class="contact-list">
+              <a href="https://wa.me/573224347855" target="_blank" rel="noreferrer" data-content-key="contact_whatsapp_label" data-content-href="whatsapp">WhatsApp: +57 322 434 7855</a>
+              <a href="mailto:belikn@gmail.com" data-content-key="contact_email" data-content-href="mailto">belikn@gmail.com</a>
+              <span data-content-key="contact_social">Instagram / TikTok / Facebook: Belikn</span>
+            </div>
+          </div>
+          <form class="lead-form" data-reveal>
+            <label><span data-i18n="name">Nombre</span><input name="name" required placeholder="Tu nombre" /></label>
+            <label><span data-i18n="interest">Interes</span><select name="interest"><option>Gorras</option><option>Perfumes</option><option>Accesorios</option><option>Combo completo</option></select></label>
+            <label><span data-i18n="message">Mensaje</span><textarea name="message" rows="4" placeholder="Quiero asesoria para..."></textarea></label>
+            <button class="primary-btn" type="submit" data-i18n="sendWhatsapp">Enviar a WhatsApp</button>
+          </form>
+        </section>
+      </main>
+
+      <footer>
+        <div class="brand"><span class="brand-mark">B</span><span>Belikan</span></div>
+        <p data-i18n="footer" data-content-key="footer_text">Moda, presencia e identidad para Colombia.</p>
+        <a href="index.html#politicas" data-i18n="footerPolicies">Politicas</a>
+      </footer>
+    </div>
+
+    <aside class="cart-drawer" aria-hidden="true">
+      <div class="drawer-head"><div><p class="eyebrow" data-i18n="cart">Carrito</p><h2 data-i18n="yourSelection">Tu seleccion</h2></div><button class="close-cart" type="button" aria-label="Cerrar carrito">x</button></div>
+      <div class="cart-items"></div>
+      <div class="cart-total"><span>Total</span><strong class="cart-total-value">$0</strong></div>
+      <button class="primary-btn checkout" type="button" data-i18n="checkout">Pedir por WhatsApp</button>
+    </aside>
+    <div class="scrim"></div>
+
+    <script src="belikan-admin/vendor/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
